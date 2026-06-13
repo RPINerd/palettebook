@@ -241,6 +241,45 @@ def to_all_formats(value: str) -> dict:  # noqa: PLR0914
     }
 
 
+def hue_shift(rgb: RGB, degrees: float) -> RGB:
+    """
+    Shift the hue of a color by a given number of degrees.
+
+    Args:
+        rgb (RGB): Normalised input color.
+        degrees (float): Hue offset in degrees (may be negative).
+
+    Returns:
+        RGB: New RGB with shifted hue, preserving saturation and value.
+    """
+    h, s, v = colorsys.rgb_to_hsv(rgb.r, rgb.g, rgb.b)
+    h = (h + degrees / 360) % 1.0
+    r, g, b = colorsys.hsv_to_rgb(h, s, v)
+    return RGB(r, g, b)
+
+
+def vary_lightness(rgb: RGB, steps: int) -> list[str]:
+    """
+    Generate {steps} number of colors by varying lightness around the base.
+
+    Args:
+        rgb (RGB): Base color.
+        steps (int): Total number of colors to produce.
+
+    Returns:
+        list[str]: List of hex strings.
+    """
+    h, _, s = colorsys.rgb_to_hls(rgb.r, rgb.g, rgb.b)
+    results = []
+    for i in range(steps):
+        t = i / max(steps - 1, 1)
+        # Spread lightness from 0.15 to 0.90
+        new_l = 0.15 + t * 0.75
+        r, g, b = colorsys.hls_to_rgb(h, new_l, s if s > 0 else 0.5)
+        results.append(rgb_to_hex(RGB(r, g, b)))
+    return results
+
+
 def normalise_to_hex(value: str) -> str:
     """
     Parse any supported color string and return a canonical hex string.
