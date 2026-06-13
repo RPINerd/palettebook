@@ -6,6 +6,7 @@ All algorithms accept a base hex color and a target count, and return a list of 
 
 import colorsys
 import random
+from collections.abc import Callable
 
 from .color_utils import RGB, hue_shift, normalise_to_hex, parse_color, rgb_to_hex, vary_lightness
 
@@ -202,7 +203,7 @@ def random_palette(base_hex: str | None = None, count: int = 6) -> list[str]:
     return results
 
 
-ALGORITHMS: dict[str, callable] = {
+ALGORITHMS: dict[str, Callable] = {
     "complementary": complementary,
     "analogous": analogous,
     "triadic": triadic,
