@@ -1,0 +1,51 @@
+/* PaletteBook CSS overrides (Tailwind handles most of the layout) */
+
+/* Mosaic grid: columns are set inline by JS, rows fill the container */
+.mosaic-grid {
+  display: grid;
+  grid-template-rows: 1fr;
+  width: 100%;
+}
+
+.mosaic-block {
+  height: 100%;
+  transition: filter 0.15s ease;
+}
+
+.mosaic-block:hover {
+  filter: brightness(1.15);
+  cursor: pointer;
+  z-index: 1;
+}
+
+/* Swatch box subtle shadow on hover */
+.swatch-box:hover {
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.6);
+}
+
+/* Native <dialog> backdrop */
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+}
+
+/* Scrollbar styling for the sidebar */
+#palette-list {
+  scrollbar-width: thin;
+  scrollbar-color: #3f3f46 transparent;
+}
+
+#palette-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+#palette-list::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 2px;
+}
+
+/* Number input — hide spin buttons for a cleaner look */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.4;
+}

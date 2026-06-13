@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PaletteBook</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col">
+
+  <!-- Top bar -->
+  <header class="flex items-center gap-3 px-5 py-3 bg-zinc-900 border-b border-zinc-800 shrink-0">
+    <span class="text-xl font-bold tracking-tight text-white">PaletteBook</span>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-56 shrink-0 bg-zinc-900 border-r border-zinc-800 flex flex-col">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
+        <span class="text-xs font-semibold uppercase tracking-widest text-zinc-400">Palettes</span>
+        <div class="flex items-center gap-1">
+          <label for="input-import-file"
+            title="Import CSV / TSV"
+            class="text-xs bg-zinc-700 hover:bg-zinc-600 text-white px-2 py-1 rounded transition cursor-pointer">
+            ↑ CSV
+          </label>
+          <input id="input-import-file" type="file" accept=".csv,.tsv,.txt" class="hidden" />
+          <button id="btn-new-palette"
+            class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded transition">
+            + New
+          </button>
+        </div>
+      </div>
+      <ul id="palette-list" class="flex-1 overflow-y-auto py-1"></ul>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 flex flex-col overflow-y-auto p-5 gap-6">
+
+      <!-- Palette header / rename -->
+      <div id="section-palette-header" class="hidden items-center gap-3">
+        <input id="input-palette-name"
+          class="bg-transparent text-xl font-bold text-white border-b border-transparent hover:border-zinc-600
+            focus:border-indigo-500 focus:outline-none transition w-64 px-1"
+          placeholder="Palette name…" />
+        <span id="palette-color-count" class="text-xs text-zinc-500"></span>
+      </div>
+
+      <!-- Mosaic preview -->
+      <section id="section-mosaic" class="hidden">
+        <div id="mosaic"
+          class="mosaic-grid rounded-xl overflow-hidden border border-zinc-800"
+          style="height: 180px;">
+          <!-- JS renders mosaic blocks here -->
+        </div>
+      </section>
+
+      <!-- Color swatches -->
+      <section id="section-swatches" class="hidden">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">Colors</h2>
+        <div id="swatch-list" class="flex flex-wrap gap-3"></div>
+      </section>
+
+      <!-- Add a color manually -->
+      <section id="section-add-color" class="hidden bg-zinc-900 rounded-xl p-4 border border-zinc-800">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">Add Color</h2>
+        <div class="flex flex-wrap gap-2 items-end">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs text-zinc-400">Format</label>
+            <select id="input-format"
+              class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-indigo-500">
+              <option value="hex">Hex</option>
+              <option value="rgb">RGB</option>
+              <option value="hsl">HSL</option>
+              <option value="hsv">HSV</option>
+              <option value="forza">Forza</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1 flex-1 min-w-40">
+            <label class="text-xs text-zinc-400">Value</label>
+            <input id="input-color-value" type="text" placeholder="#ff5733"
+              class="bg-zinc-800 border border-zinc-700 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-mono" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs text-zinc-400">Label (optional)</label>
+            <input id="input-color-name" type="text" placeholder="e.g. Sunset Orange"
+              class="bg-zinc-800 border border-zinc-700 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500" />
+          </div>
+          <!-- Color preview swatch -->
+          <div id="add-color-preview"
+            class="w-9 h-9 rounded border border-zinc-700 transition-colors shrink-0"
+            style="background:#27272a"></div>
+          <button id="btn-add-color"
+            class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded text-sm transition">
+            Add
+          </button>
+          <button id="btn-convert"
+            class="bg-zinc-700 hover:bg-zinc-600 text-white px-3 py-1.5 rounded text-sm transition">
+            Convert
+          </button>
+        </div>
+        <!-- Conversion result -->
+        <div id="convert-result" class="hidden mt-3 flex flex-row flex-nowrap gap-2 overflow-x-auto"></div>
+      </section>
+
+      <!-- Generate section -->
+      <section id="section-generate" class="bg-zinc-900 rounded-xl p-4 border border-zinc-800">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">Generate Palette</h2>
+        <div class="flex flex-wrap gap-2 items-end">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs text-zinc-400">Algorithm</label>
+            <select id="gen-algorithm"
+              class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-indigo-500">
+              <option value="complementary">Complementary</option>
+              <option value="analogous">Analogous</option>
+              <option value="triadic">Triadic</option>
+              <option value="tetradic">Tetradic</option>
+              <option value="split_complementary">Split-Complementary</option>
+              <option value="monochromatic">Monochromatic</option>
+              <option value="random">Random</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-1 flex-1 min-w-36">
+            <label class="text-xs text-zinc-400">Base Color</label>
+            <input id="gen-base-color" type="text" placeholder="#ff5733 (optional for Random)"
+              class="bg-zinc-800 border border-zinc-700 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-indigo-500 font-mono" />
+          </div>
+          <div class="flex flex-col gap-1 w-16">
+            <label class="text-xs text-zinc-400">Count</label>
+            <input id="gen-count" type="number" value="6" min="2" max="20"
+              class="bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-sm focus:outline-none
+                focus:border-indigo-500 text-center" />
+          </div>
+          <button id="btn-generate"
+            class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded text-sm transition">
+            Generate
+          </button>
+          <button id="btn-random"
+            class="bg-zinc-700 hover:bg-zinc-600 text-white px-3 py-1.5 rounded text-sm transition">
+            Random
+          </button>
+        </div>
+
+        <!-- Generated color row -->
+        <div id="gen-results" class="hidden mt-4">
+          <div id="gen-swatch-list" class="flex flex-wrap gap-3 mb-3"></div>
+          <div class="flex gap-2 flex-wrap">
+            <button id="btn-save-generated"
+              class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-1.5 rounded text-sm transition disabled:opacity-40
+                disabled:cursor-not-allowed">
+              Save to Current Palette
+            </button>
+            <button id="btn-save-generated-new"
+              class="bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-1.5 rounded text-sm transition">
+              Save to New Palette
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Empty state -->
+      <div id="empty-state" class="flex-1 flex flex-col items-center justify-center text-zinc-600 gap-2 py-16">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14 M4 4h16a2 2 0 012 2v12a2 2 0
+              01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z" />
+        </svg>
+        <p class="text-sm">Select or create a palette to get started.</p>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Rename dialog -->
+  <dialog id="dialog-rename"
+    class="bg-zinc-900 text-zinc-100 rounded-xl border border-zinc-700 p-6 shadow-2xl w-80">
+    <h3 class="font-semibold mb-3">Rename Palette</h3>
+    <input id="dialog-rename-input" type="text"
+      class="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 mb-4 text-sm focus:outline-none focus:border-indigo-500" />
+    <div class="flex justify-end gap-2">
+      <button id="dialog-rename-cancel"
+        class="px-3 py-1.5 text-sm rounded bg-zinc-700 hover:bg-zinc-600 transition">Cancel</button>
+      <button id="dialog-rename-confirm"
+        class="px-3 py-1.5 text-sm rounded bg-indigo-600 hover:bg-indigo-500 transition">Rename</button>
+    </div>
+  </dialog>
+
+  <script src="/app.js"></script>
+</body>
+</html>
