@@ -8,6 +8,7 @@ from flask import Flask, Response, send_from_directory
 from .database import init_app
 from .routes.colors import bp as colors_bp
 from .routes.generate import bp as generate_bp
+from .routes.import_csv import bp as import_bp
 from .routes.palettes import bp as palettes_bp
 
 logger = logging.getLogger(__name__)
@@ -31,7 +32,7 @@ def create_app() -> Flask:
     app.register_blueprint(palettes_bp)
     app.register_blueprint(colors_bp)
     app.register_blueprint(generate_bp)
-    # app.register_blueprint(import_bp)
+    app.register_blueprint(import_bp)
 
     # Serve the index page and static assets
     @app.get("/")
