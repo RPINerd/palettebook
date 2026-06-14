@@ -402,6 +402,13 @@ const FORMAT_PLACEHOLDERS = {
 // ---------------------------------------------------------------------------
 // Utilities
 // ---------------------------------------------------------------------------
+function exportDatabase() {
+  // Trigger a browser download by navigating to the export endpoint
+  const a = document.createElement("a");
+  a.href = "/api/export";
+  a.download = "palettebook_export.tsv";
+  a.click();
+}
 function escHtml(str) {
   return str
     .replace(/&/g, "&amp;")
@@ -435,6 +442,18 @@ function showError(msg) {
 // Event wiring
 // ---------------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", async () => {
+  // Options menu toggle
+  $("btn-options").addEventListener("click", (e) => {
+    e.stopPropagation();
+    $("options-menu").classList.toggle("hidden");
+  });
+  document.addEventListener("click", () => $("options-menu").classList.add("hidden"));
+
+  // Export database
+  $("opt-export").addEventListener("click", () => {
+    $("options-menu").classList.add("hidden");
+    exportDatabase();
+  });
   // New palette
   $("btn-new-palette").addEventListener("click", createPalette);
 

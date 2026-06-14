@@ -12,6 +12,19 @@
   <!-- Top bar -->
   <header class="flex items-center gap-3 px-5 py-3 bg-zinc-900 border-b border-zinc-800 shrink-0">
     <span class="text-xl font-bold tracking-tight text-white">PaletteBook</span>
+    <div class="ml-auto relative">
+      <button id="btn-options"
+        class="text-sm text-zinc-400 hover:text-white px-3 py-1.5 rounded hover:bg-zinc-800 transition flex items-center gap-1.5">
+        ⚙ Options
+      </button>
+      <div id="options-menu"
+        class="hidden absolute right-0 mt-1 w-52 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl z-50 overflow-hidden">
+        <button id="opt-export"
+          class="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition flex items-center gap-2">
+          ↓ Export Database
+        </button>
+      </div>
+    </div>
   </header>
 
   <div class="flex flex-1 overflow-hidden">
