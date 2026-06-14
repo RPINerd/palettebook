@@ -106,6 +106,21 @@ def delete_palette(palette_id: int) -> tuple[Response | str, int]:
     return "", 204
 
 
+@bp.delete("/")
+def delete_all_palettes() -> tuple[str, int]:
+    """
+    Delete every palette and all associated colors.
+
+    Returns:
+        tuple[str, int]: 204 No Content on success.
+    """
+    count = db.session.execute(db.select(db.func.count()).select_from(Palette)).scalar()
+    db.session.execute(db.delete(Palette))
+    db.session.commit()
+    logger.info("Deleted all palettes (%d)", count)
+    return "", 204
+
+
 @bp.post("/<int:palette_id>/colors/reorder")
 def reorder_colors(palette_id: int) -> tuple[Response, int]:
     """

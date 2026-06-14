@@ -526,6 +526,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("opt-forza-mode").addEventListener("click", () => {
     toggleForzaMode();
   });
+
+  // Clear all palettes
+  $("opt-clear-all").addEventListener("click", async () => {
+    $("options-menu").classList.add("hidden");
+    if (!confirm("Delete ALL palettes and colors? This cannot be undone.")) return;
+    await DELETE("/api/palettes/");
+    state.current = null;
+    await loadPalettes();
+    renderMain();
+    showToast("All palettes cleared.");
+  });
+
   // New palette
   $("btn-new-palette").addEventListener("click", createPalette);
 
