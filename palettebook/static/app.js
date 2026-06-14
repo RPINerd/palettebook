@@ -19,6 +19,8 @@ const state = {
   current: null,
   /** @type {string[]} */
   generated: [],
+  /** @type {boolean} */
+  forzaMode: false,
 };
 
 // ---------------------------------------------------------------------------
@@ -177,26 +179,43 @@ function buildSwatch(color, opts = {}) {
   wrap.className =
     "swatch group relative flex flex-col items-center gap-1";
 
+  const hex = color.hex_value || color;
+
   const box = document.createElement("div");
   box.className =
     "w-14 h-14 rounded-lg border border-zinc-700 cursor-pointer swatch-box transition-transform hover:scale-105";
-  box.style.backgroundColor = color.hex_value || color;
-  box.title = "Click to copy hex";
-  box.addEventListener("click", () =>
-    copyToClipboard(color.hex_value || color)
-  );
+  box.style.backgroundColor = hex;
+  box.title = "Click to copy";
+  box.addEventListener("click", () => copyToClipboard(hex));
 
-  const label = document.createElement("span");
-  label.className = "text-xs text-zinc-400 font-mono select-all";
-  label.textContent = color.hex_value || color;
+  wrap.appendChild(box);
+
+  if (state.forzaMode && color.hex_value) {
+    // Parse forza components from the hex value via a quick HSV conversion
+    const forza = hexToForza(hex);
+    const table = document.createElement("div");
+    table.className = "grid grid-cols-2 text-xs font-mono text-zinc-400 mt-0.5 gap-x-1.5 gap-y-0";
+    table.innerHTML =
+      `<span class="text-zinc-500">H</span><span class="text-zinc-200">${forza.h}</span>` +
+      `<span class="text-zinc-500">S</span><span class="text-zinc-200">${forza.s}</span>` +
+      `<span class="text-zinc-500">B</span><span class="text-zinc-200">${forza.b}</span>`;
+    table.title = "Click to copy forza value";
+    const forzaStr = `forza(${forza.h}, ${forza.s}, ${forza.b})`;
+    table.style.cursor = "pointer";
+    table.addEventListener("click", () => copyToClipboard(forzaStr));
+    wrap.appendChild(table);
+  } else {
+    const label = document.createElement("span");
+    label.className = "text-sm text-zinc-300 font-mono select-all";
+    label.textContent = hex;
+    wrap.appendChild(label);
+  }
 
   if (color.name) {
     const nameEl = document.createElement("span");
     nameEl.className = "text-xs text-zinc-500 max-w-14 truncate text-center";
     nameEl.textContent = color.name;
-    wrap.append(box, label, nameEl);
-  } else {
-    wrap.append(box, label);
+    wrap.appendChild(nameEl);
   }
 
   if (!opts.noDelete) {
@@ -402,6 +421,44 @@ const FORMAT_PLACEHOLDERS = {
 // ---------------------------------------------------------------------------
 // Utilities
 // ---------------------------------------------------------------------------
+
+/**
+ * Convert a hex color to Forza HSB components (all in [0,1], 3dp min 2dp).
+ * Mirrors the server-side _fmt_forza logic so the client never needs a round-trip.
+ *
+ * @param {string} hex  e.g. "#3b82f6"
+ * @returns {{ h: string, s: string, b: string }}
+ */
+function hexToForza(hex) {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d + 6) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h /= 6;
+  }
+  const s = max === 0 ? 0 : d / max;
+  const v = max;
+  return { h: fmtForza(h), s: fmtForza(s), b: fmtForza(v) };
+}
+
+/**
+ * Format a Forza decimal: 3dp, strip trailing zeros, keep min 2dp.
+ * @param {number} v
+ * @returns {string}
+ */
+function fmtForza(v) {
+  let s = v.toFixed(3);
+  const dot = s.indexOf(".");
+  s = s.replace(/0+$/, "");
+  if (s.length < dot + 3) s = s.padEnd(dot + 3, "0");
+  return s;
+}
+
 function exportDatabase() {
   // Trigger a browser download by navigating to the export endpoint
   const a = document.createElement("a");
@@ -409,6 +466,16 @@ function exportDatabase() {
   a.download = "palettebook_export.tsv";
   a.click();
 }
+
+function toggleForzaMode() {
+  state.forzaMode = !state.forzaMode;
+  // Update the indicator dot in the menu
+  $("forza-mode-indicator").classList.toggle("bg-indigo-500", state.forzaMode);
+  $("forza-mode-indicator").classList.toggle("border-indigo-500", state.forzaMode);
+  // Re-render swatches with new mode
+  if (state.current) renderSwatches(state.current.colors);
+}
+
 function escHtml(str) {
   return str
     .replace(/&/g, "&amp;")
@@ -453,6 +520,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("opt-export").addEventListener("click", () => {
     $("options-menu").classList.add("hidden");
     exportDatabase();
+  });
+
+  // Forza mode toggle
+  $("opt-forza-mode").addEventListener("click", () => {
+    toggleForzaMode();
   });
   // New palette
   $("btn-new-palette").addEventListener("click", createPalette);
