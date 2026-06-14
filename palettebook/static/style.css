@@ -49,3 +49,15 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   opacity: 0.4;
 }
+
+/* Collapsible sections — rotate chevron when open */
+details > summary .details-chevron {
+  display: inline-block;
+  transition: transform 0.2s ease;
+  font-style: normal;
+  line-height: 1;
+}
+
+details[open] > summary .details-chevron {
+  transform: rotate(90deg);
+}

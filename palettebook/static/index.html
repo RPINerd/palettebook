@@ -64,8 +64,12 @@
       </section>
 
       <!-- Add a color manually -->
-      <section id="section-add-color" class="hidden bg-zinc-900 rounded-xl p-4 border border-zinc-800">
-        <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">Add Color</h2>
+      <section id="section-add-color" class="hidden bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
+        <details open>
+          <summary class="px-4 py-3 cursor-pointer select-none text-xs font-semibold uppercase tracking-widest text-zinc-400 flex items-center gap-2 hover:bg-zinc-800 transition list-none">
+            <span class="details-chevron">▸</span> Add Color
+          </summary>
+          <div class="px-4 pb-4 pt-2">
         <div class="flex flex-wrap gap-2 items-end">
           <div class="flex flex-col gap-1">
             <label class="text-xs text-zinc-400">Format</label>
@@ -103,11 +107,17 @@
         </div>
         <!-- Conversion result -->
         <div id="convert-result" class="hidden mt-3 flex flex-row flex-nowrap gap-2 overflow-x-auto"></div>
+          </div>
+        </details>
       </section>
 
       <!-- Generate section -->
-      <section id="section-generate" class="bg-zinc-900 rounded-xl p-4 border border-zinc-800">
-        <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-400 mb-3">Generate Palette</h2>
+      <section id="section-generate" class="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
+        <details open>
+          <summary class="px-4 py-3 cursor-pointer select-none text-xs font-semibold uppercase tracking-widest text-zinc-400 flex items-center gap-2 hover:bg-zinc-800 transition list-none">
+            <span class="details-chevron">▸</span> Generate Palette
+          </summary>
+          <div class="px-4 pb-4 pt-2">
         <div class="flex flex-wrap gap-2 items-end">
           <div class="flex flex-col gap-1">
             <label class="text-xs text-zinc-400">Algorithm</label>
@@ -158,6 +168,8 @@
             </button>
           </div>
         </div>
+          </div>
+        </details>
       </section>
 
       <!-- Empty state -->
