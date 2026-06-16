@@ -1,6 +1,6 @@
 [project]
 name = "palettebook"
-version = "0.1.0"
+version = "0.9.0"
 description = "A locally hosted web app for managing and previewing color palettes."
 readme = "README.md"
 requires-python = ">=3.10"

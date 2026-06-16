@@ -10,6 +10,8 @@ A locally hosted web app built on Python to allow you to create groups of colors
 
 The intended use case is currently so that I can have it open via the Steam Overlay in a web page and have it open while working on Forza liveries. Obviously, this is very niche and specific for me but you can use it however you'd like!
 
+![Screenshot](media/ExampleScreen1.png)
+
 ## Installation
 
 Currently while in development, you will need to clone the repository and run it locally. In the future, I hope to package it and make installation easier.
